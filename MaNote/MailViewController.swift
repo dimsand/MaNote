@@ -29,10 +29,6 @@ class MailViewController: UIViewController, MFMailComposeViewControllerDelegate 
         composeVC.setSubject("Note de frais")
         composeVC.setMessageBody("Bonjour, voici ma note de frais !", isHTML: false)
         
-        // Present the view controller modally.
-        
-        //self.present(composeVC, animated: true, completion: nil)
-        //self.presentViewController(composeVC, animated: true, completion: nil)
         
         func mailComposeController(controller: MFMailComposeViewController,
                                    didFinishWithResult result: MFMailComposeResult, error: NSError?) {
