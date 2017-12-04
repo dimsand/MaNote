@@ -26,8 +26,8 @@ class MailViewController: UIViewController, MFMailComposeViewControllerDelegate 
         
         // Configure the fields of the interface.
         composeVC.setToRecipients(["address@example.com"])
-        composeVC.setSubject("Hello!")
-        composeVC.setMessageBody("Hello from California!", isHTML: false)
+        composeVC.setSubject("Note de frais")
+        composeVC.setMessageBody("Bonjour, voici ma note de frais !", isHTML: false)
         
         // Present the view controller modally.
         
