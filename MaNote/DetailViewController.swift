@@ -98,7 +98,7 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
         let sampleTextField = UITextField(frame: CGRect(x: position.x, y: position.y, width: getWidth(text: "Votre annotation ici"), height: 40))
         
         sampleTextField.placeholder = "Votre annotation ici"
-        sampleTextField.font = UIFont.systemFont(ofSize: 15)
+        sampleTextField.font = UIFont.systemFont(ofSize: 16)
         sampleTextField.borderStyle = UITextBorderStyle.roundedRect
         sampleTextField.autocorrectionType = UITextAutocorrectionType.no
         sampleTextField.keyboardType = UIKeyboardType.default
@@ -229,21 +229,31 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
         }
     }
     
-    @IBAction func send(_ sender: Any) {
+    @IBAction func send(_ sender: UIButton) {
         if (PhotoPrise.image != nil) {
-            let render: UIImageView = self.PhotoPrise
-            let frame: CGRect = self.PhotoPrise.frame;
-            let size: CGSize = self.PhotoPrise.frame.size
-            
-            for annotation in annotations {
-                let textImgView = UIImageView(frame: frame)
+            if (sender.title(for: .normal) == "Edit") {
+                for annotation in annotations {
+                    annotation.field.isHidden = false
+                }
                 
-                textImgView.image = self.imageFrom(text: annotation.field.text!, position: annotation.position, size: size)
-                render.addSubview(textImgView)
-                annotation.field.isHidden = true
+                sender.setTitle("Send", for: .normal)
+            } else {
+                let render: UIImageView = self.PhotoPrise
+                let frame: CGRect = self.PhotoPrise.frame;
+                let size: CGSize = self.PhotoPrise.frame.size
+                
+                for annotation in annotations {
+                    let textImgView = UIImageView(frame: frame)
+                    
+                    textImgView.image = self.imageFrom(text: annotation.field.text!, position: annotation.position, size: size)
+                    render.addSubview(textImgView)
+                    annotation.field.isHidden = true
+                }
+                
+                self.PhotoPrise.image = render.image
+                
+                sender.setTitle("Edit", for: .normal)
             }
-            
-            self.PhotoPrise.image = render.image
         }
     }
     
