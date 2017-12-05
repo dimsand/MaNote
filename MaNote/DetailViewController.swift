@@ -125,7 +125,7 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
     
         
         @IBAction func openGallery() {
-            if UIImagePickerController.isSourceTypeAvailable(.savedPhotosAlbum){
+            if UIImagePickerController.isSourceTypeAvailable(.photoLibrary){
                 let PhotoPrise = UIImagePickerController()
                 
                 PhotoPrise.delegate = self
