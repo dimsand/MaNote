@@ -6,6 +6,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -41,10 +42,17 @@
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                             </imageView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="w7S-yQ-AOk">
-                                <rect key="frame" x="168.5" y="611" width="38" height="30"/>
+                                <rect key="frame" x="66" y="611" width="38" height="30"/>
                                 <state key="normal" title="Open"/>
                                 <connections>
                                     <action selector="openGallery" destination="JEX-9P-axG" eventType="touchUpInside" id="Fc7-vH-r2M"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jk3-fo-9qC">
+                                <rect key="frame" x="273" y="611" width="36" height="30"/>
+                                <state key="normal" title="Send"/>
+                                <connections>
+                                    <action selector="send:" destination="JEX-9P-axG" eventType="touchUpInside" id="EXm-9k-DVa"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -53,8 +61,10 @@
                             <constraint firstItem="RlK-Vt-fx5" firstAttribute="centerY" secondItem="svH-Pt-448" secondAttribute="centerY" id="23j-Md-EQV"/>
                             <constraint firstItem="GAO-Cl-Wes" firstAttribute="top" secondItem="w7S-yQ-AOk" secondAttribute="bottom" constant="26" id="Cr1-EG-CW4"/>
                             <constraint firstItem="RlK-Vt-fx5" firstAttribute="width" secondItem="svH-Pt-448" secondAttribute="width" id="GQl-jA-7Pd"/>
-                            <constraint firstItem="w7S-yQ-AOk" firstAttribute="centerX" secondItem="svH-Pt-448" secondAttribute="centerX" id="XJc-Q0-zkR"/>
+                            <constraint firstItem="w7S-yQ-AOk" firstAttribute="leading" secondItem="svH-Pt-448" secondAttribute="leadingMargin" constant="50" id="U1d-7S-m3C"/>
                             <constraint firstItem="RlK-Vt-fx5" firstAttribute="height" secondItem="svH-Pt-448" secondAttribute="height" id="a3C-ZE-FLT"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="jk3-fo-9qC" secondAttribute="trailing" constant="50" id="b0P-Qq-JX1"/>
+                            <constraint firstItem="jk3-fo-9qC" firstAttribute="centerY" secondItem="w7S-yQ-AOk" secondAttribute="centerY" id="f4b-NX-2JL"/>
                             <constraint firstItem="RlK-Vt-fx5" firstAttribute="centerX" secondItem="svH-Pt-448" secondAttribute="centerX" id="nmW-ZL-Sba"/>
                         </constraints>
                     </view>

@@ -10,14 +10,13 @@ import UIKit
 import CoreData
 
 class DetailViewController: UIViewController,UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIGestureRecognizerDelegate, UITextFieldDelegate {
-
+    
     @IBOutlet weak var detailDescriptionLabel: UILabel!
     @IBOutlet weak var PhotoPrise: UIImageView!
     
     var textFiled: UITextField?
     var annotations = [AnnotationData]()
     var tagId: Int = 0
-    var chosenImage: UIImage? = nil
     var id_loaded: String = ""
     
     var documentsUrl: URL {
@@ -29,7 +28,6 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
         if let detail = detailItem {
             self.id_loaded = detail.value(forKey: "id") as! String
             if(detail.value(forKey: "image_src") != nil){
-                self.chosenImage = self.load(fileName: detail.value(forKey: "image_src") as! String)
                 PhotoPrise?.image = self.load(fileName: detail.value(forKey: "image_src") as! String)
             }
         }
@@ -70,12 +68,12 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
         self.navigationItem.rightBarButtonItem = saveAnnotButton
         
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
+    
     var detailItem: Ticket? {
         didSet {
             // Update the view.
@@ -144,18 +142,8 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
         }
     }
     
-    func imageFrom(text: String , position: CGPoint, size:CGSize) -> UIImage {
-        let renderer = UIGraphicsImageRenderer(size: size)
-        let img = renderer.image { ctx in
-            let paragraphStyle = NSMutableParagraphStyle()
-            paragraphStyle.alignment = .left
-            let attrs = [NSFontAttributeName: UIFont(name: "HelveticaNeue", size: 20)!, NSForegroundColorAttributeName: UIColor.white, NSParagraphStyleAttributeName: paragraphStyle, NSBackgroundColorAttributeName: UIColor.darkGray]
-            text.draw(with: CGRect(x: (position.x - 100), y: (position.y), width: size.width, height: (size.height+100)), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
-        }
-        return img
-    }
     
-        
+    
     @IBAction func openGallery() {
         if UIImagePickerController.isSourceTypeAvailable(.photoLibrary){
             let PhotoPrise = UIImagePickerController()
@@ -174,7 +162,6 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
     
     public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
-            self.chosenImage = image
             PhotoPrise.image = image
         }
         
@@ -182,7 +169,7 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
     }
     
     func saveImage(_ sender: Any) {
-        if (self.chosenImage != nil) {
+        if (self.PhotoPrise.image != nil) {
             let directoryPath =  NSHomeDirectory().appending("/Documents/")
             
             if !FileManager.default.fileExists(atPath: directoryPath) {
@@ -198,7 +185,7 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
             let url = NSURL.fileURL(withPath: filepath)
 
             do {
-                try UIImageJPEGRepresentation(self.chosenImage!, 1.0)?.write(to: url, options: .atomic)
+                try UIImageJPEGRepresentation(self.PhotoPrise.image!, 1.0)?.write(to: url, options: .atomic)
             } catch {
                 print(error)
                 print("file cant not be save at path \(filepath), with error : \(error)");
@@ -233,13 +220,45 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
                 {
                     print(error)
                 }
-            }
+           }
+            
         }
         catch
         {
             print(error)
         }
-        
     }
+    
+    @IBAction func send(_ sender: Any) {
+        if (PhotoPrise.image != nil) {
+            let render: UIImageView = self.PhotoPrise
+            let frame: CGRect = self.PhotoPrise.frame;
+            let size: CGSize = self.PhotoPrise.frame.size
+            
+            for annotation in annotations {
+                let textImgView = UIImageView(frame: frame)
+                
+                textImgView.image = self.imageFrom(text: annotation.field.text!, position: annotation.position, size: size)
+                render.addSubview(textImgView)
+                annotation.field.isHidden = true
+            }
+            
+            self.PhotoPrise.image = render.image
+        }
+    }
+    
+    private func imageFrom(text: String , position: CGPoint, size:CGSize) -> UIImage {
+        let renderer = UIGraphicsImageRenderer(size: size)
+        let img = renderer.image { ctx in
+            let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.alignment = .left
+            let attrs = [NSFontAttributeName: UIFont(name: "HelveticaNeue", size: 16)!, NSForegroundColorAttributeName: UIColor.white, NSParagraphStyleAttributeName: paragraphStyle]
+            text.draw(with: CGRect(x: (position.x), y: (position.y + 16), width: size.width, height: (size.height+100)), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
+        }
+        
+
+        return img
+    }
+    
 }
 
