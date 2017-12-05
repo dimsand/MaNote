@@ -26,15 +26,13 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
                 label.text = detail.timestamp!.description
             }
         }
-        
     }
 
     override func viewWillAppear(_ animated: Bool)
     {
         let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(touchPhoto(touch:)))
-        //Add the recognizer to your view.
-        PhotoPrise.isUserInteractionEnabled = true
         tapRecognizer.numberOfTapsRequired = 1
+        PhotoPrise.isUserInteractionEnabled = true
         PhotoPrise.addGestureRecognizer(tapRecognizer)
     }
     
@@ -47,12 +45,6 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
         
         let saveAnnotButton = UIBarButtonItem(title: "Save", style: UIBarButtonItemStyle.plain, target: self, action: #selector(save(_:)))
         self.navigationItem.rightBarButtonItem = saveAnnotButton
-        
-        let date : Date = Date()
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyyMMdd"
-        let todaysDate = dateFormatter.string(from: date)
-        print(todaysDate)
     }
 
     override func didReceiveMemoryWarning() {
@@ -72,19 +64,6 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
         print("save")
         print(annotations)
     }
-    
-    // Création d'une annotation
-    /*func createAnnotation(){
-        print("create annotation")
-        
-        let textImgView = UIImageView(frame: PhotoPrise.frame)
-        textImgView.image = imageFrom(text: "Example text", size: PhotoPrise.frame.size)
-        
-        textImgView.layer.masksToBounds = false;
-        textImgView.layer.cornerRadius = 2;
-        
-        PhotoPrise.addSubview(textImgView)
-    }*/
     
     // Création de l'EditText pour l'annotation
     func createAnnotation(){
