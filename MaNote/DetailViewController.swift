@@ -105,11 +105,14 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
     }
     
     func touchPhoto(touch: UITapGestureRecognizer) {
-        let touchPoint = touch.location(in: PhotoPrise) as CGPoint
-        xValue = touchPoint.x
-        yValue = touchPoint.y
+        if (PhotoPrise.image != nil) {
+            let touchPoint = touch.location(in: PhotoPrise) as CGPoint
+            
+            xValue = touchPoint.x
+            yValue = touchPoint.y
         
-        self.createAnnotation()
+            self.createAnnotation()
+        }
     }
     
     func imageFrom(text: String , size:CGSize) -> UIImage {
