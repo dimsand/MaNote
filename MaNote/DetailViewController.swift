@@ -101,8 +101,14 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
     
     func textFieldShouldClear(_ textField: UITextField) -> Bool {
         textField.isHidden = true
-        annotations.remove(at: (textField.tag - 1))
-        return false
+        
+        for (index, annotation) in annotations.enumerated() {
+            if (annotation.field.tag == textField.tag) {
+                annotations.remove(at: (index))
+            }
+        }
+        
+        return true
     }
     
     func touchPhoto(touch: UITapGestureRecognizer) {
