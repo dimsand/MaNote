@@ -14,9 +14,7 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
     @IBOutlet weak var PhotoPrise: UIImageView!
     
     var textFiled: UITextField?
-    var annotations = [UITextField]()
-    var xValue = CGFloat()
-    var yValue = CGFloat()
+    var annotations = [Annotation]()
     var tagId: Int = 0
     var chosenImage: UIImage? = nil
     
@@ -59,17 +57,20 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
     }
     
     // Création de l'EditText pour l'annotation
-    func createAnnotation() {
-        let sampleTextField = self.createTextField()
+    func createAnnotation(position: CGPoint) {
+        let annotation = Annotation()
+        
+        annotation.field = self.createTextField(position: position)
+        annotation.position = position
         
         self.view.layoutIfNeeded() // if you use Auto layout
-        self.view.addSubview(sampleTextField)
+        self.view.addSubview(annotation.field)
         
-        annotations.append(sampleTextField)
+        annotations.append(annotation)
     }
     
-    private func createTextField() -> UITextField {
-        let sampleTextField = UITextField(frame: CGRect(x: xValue, y: yValue, width: getWidth(text: "Votre annotation ici"), height: 40))
+    private func createTextField(position: CGPoint) -> UITextField {
+        let sampleTextField = UITextField(frame: CGRect(x: position.x, y: position.y, width: getWidth(text: "Votre annotation ici"), height: 40))
         
         sampleTextField.placeholder = "Votre annotation ici"
         sampleTextField.font = UIFont.systemFont(ofSize: 15)
@@ -100,25 +101,29 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
     
     func textFieldShouldClear(_ textField: UITextField) -> Bool {
         textField.isHidden = true
-        annotations.remove(at: (textField.tag - 1))
-        return false
+        
+        for (index, annotation) in annotations.enumerated() {
+            if (annotation.field.tag == textField.tag) {
+                annotations.remove(at: (index))
+            }
+        }
+        
+        return true
     }
     
     func touchPhoto(touch: UITapGestureRecognizer) {
-        let touchPoint = touch.location(in: PhotoPrise) as CGPoint
-        xValue = touchPoint.x
-        yValue = touchPoint.y
-        
-        self.createAnnotation()
+        if (PhotoPrise.image != nil) {
+            self.createAnnotation(position: touch.location(in: PhotoPrise) as CGPoint)
+        }
     }
     
-    func imageFrom(text: String , size:CGSize) -> UIImage {
+    func imageFrom(text: String , position: CGPoint, size:CGSize) -> UIImage {
         let renderer = UIGraphicsImageRenderer(size: size)
         let img = renderer.image { ctx in
             let paragraphStyle = NSMutableParagraphStyle()
             paragraphStyle.alignment = .left
             let attrs = [NSFontAttributeName: UIFont(name: "HelveticaNeue", size: 20)!, NSForegroundColorAttributeName: UIColor.white, NSParagraphStyleAttributeName: paragraphStyle, NSBackgroundColorAttributeName: UIColor.darkGray]
-            text.draw(with: CGRect(x: (xValue - 100), y: (yValue), width: size.width, height: (size.height+100)), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
+            text.draw(with: CGRect(x: (position.x - 100), y: (position.y), width: size.width, height: (size.height+100)), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
         }
         return img
     }
