@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="H1p-Uh-vWS">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16G1036" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="H1p-Uh-vWS">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -40,11 +40,20 @@
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="RlK-Vt-fx5">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                             </imageView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="w7S-yQ-AOk">
+                                <rect key="frame" x="168.5" y="611" width="38" height="30"/>
+                                <state key="normal" title="Open"/>
+                                <connections>
+                                    <action selector="openGallery" destination="JEX-9P-axG" eventType="touchUpInside" id="Fc7-vH-r2M"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="RlK-Vt-fx5" firstAttribute="centerY" secondItem="svH-Pt-448" secondAttribute="centerY" id="23j-Md-EQV"/>
+                            <constraint firstItem="GAO-Cl-Wes" firstAttribute="top" secondItem="w7S-yQ-AOk" secondAttribute="bottom" constant="26" id="Cr1-EG-CW4"/>
                             <constraint firstItem="RlK-Vt-fx5" firstAttribute="width" secondItem="svH-Pt-448" secondAttribute="width" id="GQl-jA-7Pd"/>
+                            <constraint firstItem="w7S-yQ-AOk" firstAttribute="centerX" secondItem="svH-Pt-448" secondAttribute="centerX" id="XJc-Q0-zkR"/>
                             <constraint firstItem="RlK-Vt-fx5" firstAttribute="height" secondItem="svH-Pt-448" secondAttribute="height" id="a3C-ZE-FLT"/>
                             <constraint firstItem="RlK-Vt-fx5" firstAttribute="centerX" secondItem="svH-Pt-448" secondAttribute="centerX" id="nmW-ZL-Sba"/>
                         </constraints>

@@ -13,12 +13,13 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
     @IBOutlet weak var detailDescriptionLabel: UILabel!
     @IBOutlet weak var PhotoPrise: UIImageView!
     
-    var textFiled: UITextField? = nil;
+    var textFiled: UITextField?
     var annotations = [UITextField]()
     var xValue = CGFloat()
     var yValue = CGFloat()
-    var tagId: Int = 0;
-
+    var tagId: Int = 0
+    var chosenImage: UIImage? = nil
+    
     func configureView() {
         // Update the user interface for the detail item.
         if let detail = detailItem {
@@ -41,9 +42,7 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
         // Do any additional setup after loading the view, typically from a nib.
         configureView()
         
-        PhotoPrise.image = UIImage(named: "ticket");
-        
-        let saveAnnotButton = UIBarButtonItem(title: "Save", style: UIBarButtonItemStyle.plain, target: self, action: #selector(save(_:)))
+        let saveAnnotButton = UIBarButtonItem(title: "Save", style: UIBarButtonItemStyle.plain, target: self, action: #selector(saveImage(_:)))
         self.navigationItem.rightBarButtonItem = saveAnnotButton
     }
 
@@ -59,15 +58,19 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
         }
     }
     
-    func save(_ sender: Any){
+    // Création de l'EditText pour l'annotation
+    func createAnnotation() {
+        let sampleTextField = self.createTextField()
         
-        print("save")
-        print(annotations)
+        self.view.layoutIfNeeded() // if you use Auto layout
+        self.view.addSubview(sampleTextField)
+        
+        annotations.append(sampleTextField)
     }
     
-    // Création de l'EditText pour l'annotation
-    func createAnnotation(){
+    private func createTextField() -> UITextField {
         let sampleTextField = UITextField(frame: CGRect(x: xValue, y: yValue, width: getWidth(text: "Votre annotation ici"), height: 40))
+        
         sampleTextField.placeholder = "Votre annotation ici"
         sampleTextField.font = UIFont.systemFont(ofSize: 15)
         sampleTextField.borderStyle = UITextBorderStyle.roundedRect
@@ -77,12 +80,11 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
         sampleTextField.clearButtonMode = UITextFieldViewMode.whileEditing;
         sampleTextField.contentVerticalAlignment = UIControlContentVerticalAlignment.center
         sampleTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+        sampleTextField.delegate = self
         tagId = tagId + 1
         sampleTextField.tag = tagId
-        self.view.layoutIfNeeded() // if you use Auto layout
-        sampleTextField.delegate = self
-        self.view.addSubview(sampleTextField)
-        annotations.append(sampleTextField)
+        
+        return sampleTextField
     }
     
     func getWidth(text: String) -> CGFloat {
@@ -106,6 +108,7 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
         let touchPoint = touch.location(in: PhotoPrise) as CGPoint
         xValue = touchPoint.x
         yValue = touchPoint.y
+        
         self.createAnnotation()
     }
     
@@ -120,5 +123,57 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
         return img
     }
     
+        
+        @IBAction func openGallery() {
+            if UIImagePickerController.isSourceTypeAvailable(.savedPhotosAlbum){
+                let PhotoPrise = UIImagePickerController()
+                
+                PhotoPrise.delegate = self
+                PhotoPrise.sourceType = .photoLibrary;
+                PhotoPrise.allowsEditing = false
+                
+                self.present(PhotoPrise, animated: true, completion: nil)
+            }
+        }
+        
+        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+            dismiss(animated: true, completion: nil)
+        }
+        
+        public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+            if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
+                self.chosenImage = image
+                PhotoPrise.image = image
+            }
+            
+            self.dismiss(animated: true, completion: nil)
+        }
+        
+        func saveImage(_ sender: Any) {
+            if (self.chosenImage != nil) {
+                let directoryPath =  NSHomeDirectory().appending("/Documents/")
+                
+                if !FileManager.default.fileExists(atPath: directoryPath) {
+                    do {
+                        try FileManager.default.createDirectory(at: NSURL.fileURL(withPath: directoryPath), withIntermediateDirectories: true, attributes: nil)
+                    } catch {
+                        print(error)
+                    }
+                }
+                
+                let filename = NSUUID().uuidString
+                let filepath = directoryPath.appending(filename)
+                let url = NSURL.fileURL(withPath: filepath)
+                
+                do {
+                    try UIImageJPEGRepresentation(self.chosenImage!, 1.0)?.write(to: url, options: .atomic)
+                    print(filepath)
+                } catch {
+                    print(error)
+                    print("file cant not be save at path \(filepath), with error : \(error)");
+                }
+                
+            }
+        }
 }
 
