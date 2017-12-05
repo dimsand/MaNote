@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8484BF221FD6AE24007CE6CC /* Annotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8484BF211FD6AE24007CE6CC /* Annotation.swift */; };
 		84D118411FD546860014D4CD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D118401FD546860014D4CD /* AppDelegate.swift */; };
 		84D118441FD546860014D4CD /* MaNote.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 84D118421FD546860014D4CD /* MaNote.xcdatamodeld */; };
 		84D118461FD546860014D4CD /* MasterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D118451FD546860014D4CD /* MasterViewController.swift */; };
@@ -17,6 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		8484BF211FD6AE24007CE6CC /* Annotation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Annotation.swift; sourceTree = "<group>"; };
 		84D1183D1FD546860014D4CD /* MaNote.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MaNote.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		84D118401FD546860014D4CD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		84D118431FD546860014D4CD /* MaNote.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = MaNote.xcdatamodel; sourceTree = "<group>"; };
@@ -66,6 +68,7 @@
 				84D1184E1FD546860014D4CD /* LaunchScreen.storyboard */,
 				84D118511FD546860014D4CD /* Info.plist */,
 				84D118421FD546860014D4CD /* MaNote.xcdatamodeld */,
+				8484BF211FD6AE24007CE6CC /* Annotation.swift */,
 			);
 			path = MaNote;
 			sourceTree = "<group>";
@@ -143,6 +146,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				84D118411FD546860014D4CD /* AppDelegate.swift in Sources */,
+				8484BF221FD6AE24007CE6CC /* Annotation.swift in Sources */,
 				84D118441FD546860014D4CD /* MaNote.xcdatamodeld in Sources */,
 				84D118461FD546860014D4CD /* MasterViewController.swift in Sources */,
 				84D118481FD546860014D4CD /* DetailViewController.swift in Sources */,
@@ -307,6 +311,7 @@
 				84D118561FD546860014D4CD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
