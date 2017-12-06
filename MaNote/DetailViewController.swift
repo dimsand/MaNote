@@ -18,7 +18,6 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
     var textFiled: UITextField?
     var annotations = [AnnotationData]()
     var text_annotations = [UIImageView]()
-    var annnotationsModel = [Annotation]()
     var tagId: Int = 0
     var id_loaded: String = ""
     
@@ -31,38 +30,35 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
     func configureView() {
         // Update the user interface for the detail item.
         if let detail = detailItem {
-            
-            if (annnotationsModel.count == 0) {
-                guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-                    return
-                }
-                
-                let managedContext = appDelegate.persistentContainer.viewContext
-                
-                let fetchRequest:NSFetchRequest<NSFetchRequestResult> = NSFetchRequest.init(entityName: "Annotation")
-                fetchRequest.predicate = NSPredicate(format: "ticket_id = %@", detail.id!)
-                do
-                {
-                    annnotationsModel = try managedContext.fetch(fetchRequest) as! [Annotation]
-                    for model in annnotationsModel {
-                        print(model)
-                        createAnnotation(position: CGPoint(x: model.positionX, y: model.positionY), text: model.label)
-                        managedContext.delete(model)
-                    }
-                }
-                catch
-                {
-                    print(error)
-                }
-
-            }
-            
             self.id_loaded = detail.value(forKey: "id") as! String
             self.title = detail.value(forKey: "id") as! String
             if(detail.value(forKey: "image_src") != nil){
                 PhotoPrise?.image = self.load(fileName: detail.value(forKey: "image_src") as! String)
             }
         }
+    }
+    
+    private func removeAllAnnotation() {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            return
+        }
+        
+        let context = appDelegate.persistentContainer.viewContext
+        
+        let fetchRequest:NSFetchRequest<NSFetchRequestResult> = NSFetchRequest.init(entityName: "Annotation")
+        fetchRequest.predicate = NSPredicate(format: "ticket_id = %@", id_loaded)
+        do
+        {
+            let models = try context.fetch(fetchRequest) as! [Annotation]
+            for model in models {
+                context.delete(model)
+            }
+        }
+        catch
+        {
+            print(error)
+        }
+
     }
     
     private func load(fileName: String) -> UIImage! {
@@ -101,10 +97,29 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
         let saveAnnotButton = UIBarButtonItem(title: "Send", style: UIBarButtonItemStyle.plain, target: self, action: #selector(sendMail(_:)))
         self.navigationItem.rightBarButtonItem = saveAnnotButton
         
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            return
+        }
+        
+        let managedContext = appDelegate.persistentContainer.viewContext
+        
+        let fetchRequest:NSFetchRequest<NSFetchRequestResult> = NSFetchRequest.init(entityName: "Annotation")
+        fetchRequest.predicate = NSPredicate(format: "ticket_id = %@", id_loaded)
+        do
+        {
+            let models = try managedContext.fetch(fetchRequest) as! [Annotation]
+            for model in models {
+                createAnnotation(position: CGPoint(x: model.positionX, y: model.positionY), text: model.label)
+            }
+        }
+        catch
+        {
+            print(error)
+        }
+
     }
     
     override func viewDidDisappear(_ animated: Bool) {
-        annnotationsModel = [Annotation]()
         annotations = [AnnotationData]()
     }
     
@@ -238,6 +253,8 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
     }
     
     private func saveInDb(imageSrc: String){
+        removeAllAnnotation()
+        
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
                 return
         }
@@ -327,20 +344,33 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
     }
     
     func sendMail(_ sender: Any) {
-        let composeVC = MFMailComposeViewController()
-        composeVC.mailComposeDelegate = self
-        
-        // Configure the fields of the interface.
-        composeVC.setToRecipients(["address@example.com"])
-        composeVC.setSubject("Note de frais")
-        composeVC.setMessageBody("Bonjour, voici ma note de frais.", isHTML: true)
-        
-        // Present the view controller modally.
-        self.present(composeVC, animated: true, completion: nil)
+        if !MFMailComposeViewController.canSendMail() {
+            let composeVC = MFMailComposeViewController()
+            composeVC.mailComposeDelegate = self
+            
+            // Configure the fields of the interface.
+            composeVC.setToRecipients(["address@example.com"])
+            composeVC.setSubject("Note de frais")
+            composeVC.setMessageBody("Bonjour, voici ma note de frais.", isHTML: true)
+            
+            // Present the view controller modally.
+            self.present(composeVC, animated: true, completion: nil)
+        } else {
+            print("Not working on simulator")
+        }
     }
+    
+    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        // Check the result or perform other tasks.
+        
+        // Dismiss the mail compose view controller.
+        controller.dismiss(animated: true, completion: nil)
+    }
+    
 
     @IBAction func clearImage(_ sender: UIButton) {
-        print("CLEAR")
+        removeAllAnnotation()
+        
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             return
         }
@@ -353,7 +383,6 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
             if ticket.count == 1
             {
                 let ticketObject = ticket[0] as! NSManagedObject
-                print(ticketObject);
 
                 self.PhotoPrise.image = self.load(fileName: ticketObject.value(forKey: "image_src") as! String)
                 for annotation in annotations{

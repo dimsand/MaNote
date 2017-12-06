@@ -123,9 +123,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         if(ticket.image_src != nil){
             cell.backgroundView = UIImageView(image: self.load(fileName: ticket.image_src!))
             cell.textLabel?.textColor = UIColor.white
-            print("oui image")
         }else{
-            print("pas d'image")
             cell.contentView.backgroundColor = UIColor.gray
         }
     }
@@ -214,15 +212,5 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         tableView.endUpdates()
     }
-
-    /*
-     // Implementing the above methods to update the table view in response to individual changes may have performance implications if a large number of changes are made simultaneously. If this proves to be an issue, you can instead just implement controllerDidChangeContent: which notifies the delegate that all section and object changes have been processed.
-     
-     func controllerDidChangeContent(controller: NSFetchedResultsController) {
-         // In the simplest, most efficient, case, reload the table view.
-         tableView.reloadData()
-     }
-     */
-
 }
 
