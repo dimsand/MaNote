@@ -16,6 +16,7 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
     
     var textFiled: UITextField?
     var annotations = [AnnotationData]()
+    var text_annotations = [UIImageView]()
     var tagId: Int = 0
     var id_loaded: String = ""
     
@@ -27,6 +28,7 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
         // Update the user interface for the detail item.
         if let detail = detailItem {
             self.id_loaded = detail.value(forKey: "id") as! String
+            self.title = detail.value(forKey: "id") as! String
             if(detail.value(forKey: "image_src") != nil){
                 PhotoPrise?.image = self.load(fileName: detail.value(forKey: "image_src") as! String)
             }
@@ -236,7 +238,7 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
                     annotation.field.isHidden = false
                 }
                 
-                sender.setTitle("Send", for: .normal)
+                sender.setTitle("Render", for: .normal)
             } else {
                 let render: UIImageView = self.PhotoPrise
                 let frame: CGRect = self.PhotoPrise.frame;
@@ -247,6 +249,7 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
                     
                     textImgView.image = self.imageFrom(text: annotation.field.text!, position: annotation.position, size: size)
                     render.addSubview(textImgView)
+                    text_annotations.append(textImgView)
                     annotation.field.isHidden = true
                 }
                 
@@ -262,7 +265,7 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
         let img = renderer.image { ctx in
             let paragraphStyle = NSMutableParagraphStyle()
             paragraphStyle.alignment = .left
-            let attrs = [NSFontAttributeName: UIFont(name: "HelveticaNeue", size: 16)!, NSForegroundColorAttributeName: UIColor.white, NSParagraphStyleAttributeName: paragraphStyle]
+            let attrs = [NSFontAttributeName: UIFont(name: "HelveticaNeue", size: 16)!, NSForegroundColorAttributeName: UIColor.red, NSParagraphStyleAttributeName: paragraphStyle]
             text.draw(with: CGRect(x: (position.x), y: (position.y + 16), width: size.width, height: (size.height+100)), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
         }
         
@@ -270,5 +273,37 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
         return img
     }
     
+    @IBAction func clearImage(_ sender: UIButton) {
+        print("CLEAR")
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            return
+        }
+        let managedContext = appDelegate.persistentContainer.viewContext
+        let fetchRequest:NSFetchRequest<NSFetchRequestResult> = NSFetchRequest.init(entityName: "Ticket")
+        fetchRequest.predicate = NSPredicate(format: "id = %@", self.id_loaded)
+        do
+        {
+            let ticket = try managedContext.fetch(fetchRequest)
+            if ticket.count == 1
+            {
+                let ticketObject = ticket[0] as! NSManagedObject
+                print(ticketObject);
+
+                self.PhotoPrise.image = self.load(fileName: ticketObject.value(forKey: "image_src") as! String)
+                for annotation in annotations{
+                    annotation.field.removeFromSuperview()
+                }
+                for text_annotation in text_annotations{
+                    text_annotation.removeFromSuperview()
+                }
+                annotations.removeAll()
+                text_annotations.removeAll()
+            }
+        }
+        catch
+        {
+            print(error)
+        }
+    }
 }
 

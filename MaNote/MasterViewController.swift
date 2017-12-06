@@ -14,11 +14,17 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     var detailViewController: DetailViewController? = nil
     var managedObjectContext: NSManagedObjectContext? = nil
 
+    @IBOutlet var tableViewRow: UITableView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        tableViewRow.separatorInset = .zero
         // Do any additional setup after loading the view, typically from a nib.
         navigationItem.leftBarButtonItem = editButtonItem
+        
+        navigationController?.navigationBar.barTintColor = UIColor.lightGray
+        navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
 
         let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(insertNewObject(_:)))
         navigationItem.rightBarButtonItem = addButton
@@ -111,7 +117,33 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     }
 
     func configureCell(_ cell: UITableViewCell, withEvent ticket: Ticket) {
-        cell.textLabel!.text = "(ID \(ticket.id!)) \(ticket.timestamp)"
+        cell.textLabel!.text = "ID \(ticket.id!)"
+        cell.contentView.backgroundColor = nil
+        cell.backgroundView = nil
+        if(ticket.image_src != nil){
+            cell.backgroundView = UIImageView(image: self.load(fileName: ticket.image_src!))
+            cell.textLabel?.textColor = UIColor.white
+            print("oui image")
+        }else{
+            print("pas d'image")
+            cell.contentView.backgroundColor = UIColor.gray
+        }
+    }
+    
+    var documentsUrl: URL {
+        return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+    }
+    private func load(fileName: String) -> UIImage! {
+        let fileURL = documentsUrl.appendingPathComponent("\(fileName)")
+        do {
+            let imageData = try Data(contentsOf: fileURL)
+            if let image = UIImage(data: imageData) {
+                return image
+            }
+        } catch {
+            print("Error loading image : \(error)")
+        }
+        return nil
     }
 
     // MARK: - Fetched results controller
