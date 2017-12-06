@@ -8,8 +8,9 @@
 
 import UIKit
 import CoreData
+import MessageUI
 
-class DetailViewController: UIViewController,UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIGestureRecognizerDelegate, UITextFieldDelegate {
+class DetailViewController: UIViewController,UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIGestureRecognizerDelegate, UITextFieldDelegate ,MFMailComposeViewControllerDelegate {
     
     @IBOutlet weak var detailDescriptionLabel: UILabel!
     @IBOutlet weak var PhotoPrise: UIImageView!
@@ -94,7 +95,8 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
         configureView()
         
         // TODO Remplacer le save -> send mail
-        let saveAnnotButton = UIBarButtonItem(title: "Send", style: UIBarButtonItemStyle.plain, target: self, action: #selector(saveImage(_:)))
+        //let saveAnnotButton = UIBarButtonItem(title: "Send", style: UIBarButtonItemStyle.plain, target: self, action: #selector(saveImage(_:)))
+        let saveAnnotButton = UIBarButtonItem(title: "Send", style: UIBarButtonItemStyle.plain, target: self, action: #selector(sendMail(_:)))
         self.navigationItem.rightBarButtonItem = saveAnnotButton
         
     }
@@ -302,6 +304,7 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
                 }
                 
                 self.PhotoPrise.image = render.image
+                saveImage(_: (Any).self)
                 
                 sender.setTitle("Edit", for: .normal)
             }
@@ -321,5 +324,18 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
         return img
     }
     
+    func sendMail(_ sender: Any) {
+        let composeVC = MFMailComposeViewController()
+        composeVC.mailComposeDelegate = self
+        
+        // Configure the fields of the interface.
+        composeVC.setToRecipients(["address@example.com"])
+        composeVC.setSubject("Note de frais")
+        composeVC.setMessageBody("Bonjour, voici ma note de frais.", isHTML: true)
+        
+        // Present the view controller modally.
+        self.present(composeVC, animated: true, completion: nil)
+    }
+        
 }
 
