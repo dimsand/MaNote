@@ -41,23 +41,41 @@
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="RlK-Vt-fx5">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                             </imageView>
+                            <view alpha="0.80000000000000004" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="9N8-Bk-ekT">
+                                <rect key="frame" x="0.0" y="602" width="375" height="45"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.90162136130136983" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="45" id="5Ab-jJ-roo"/>
+                                </constraints>
+                            </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="w7S-yQ-AOk">
-                                <rect key="frame" x="66" y="611" width="38" height="30"/>
-                                <state key="normal" title="Open"/>
+                                <rect key="frame" x="66" y="608" width="42" height="33"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <state key="normal" title="Open">
+                                    <color key="titleColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                    <color key="titleShadowColor" red="1" green="1" blue="1" alpha="0.95015517979999997" colorSpace="calibratedRGB"/>
+                                </state>
                                 <connections>
                                     <action selector="openGallery" destination="JEX-9P-axG" eventType="touchUpInside" id="Fc7-vH-r2M"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jk3-fo-9qC">
-                                <rect key="frame" x="275" y="611" width="34" height="30"/>
-                                <state key="normal" title="Save"/>
+                                <rect key="frame" x="272" y="608" width="37" height="33"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <state key="normal" title="Save">
+                                    <color key="titleColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                    <color key="titleShadowColor" red="1" green="1" blue="1" alpha="0.95015517979999997" colorSpace="calibratedRGB"/>
+                                </state>
                                 <connections>
                                     <action selector="send:" destination="JEX-9P-axG" eventType="touchUpInside" id="EXm-9k-DVa"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4fe-9y-Sbt">
-                                <rect key="frame" x="169" y="611" width="36" height="30"/>
-                                <state key="normal" title="Clear"/>
+                                <rect key="frame" x="166.5" y="608" width="41" height="33"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <state key="normal" title="Clear">
+                                    <color key="titleColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
                                 <connections>
                                     <action selector="clearImage:" destination="JEX-9P-axG" eventType="touchUpInside" id="eVN-8k-vlH"/>
                                 </connections>
@@ -66,11 +84,14 @@
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="RlK-Vt-fx5" firstAttribute="centerY" secondItem="svH-Pt-448" secondAttribute="centerY" id="23j-Md-EQV"/>
+                            <constraint firstItem="9N8-Bk-ekT" firstAttribute="centerX" secondItem="svH-Pt-448" secondAttribute="centerX" id="7L3-3h-qOb"/>
                             <constraint firstItem="4fe-9y-Sbt" firstAttribute="centerX" secondItem="RlK-Vt-fx5" secondAttribute="centerX" id="Bg0-k4-wRe"/>
                             <constraint firstItem="GAO-Cl-Wes" firstAttribute="top" secondItem="w7S-yQ-AOk" secondAttribute="bottom" constant="26" id="Cr1-EG-CW4"/>
                             <constraint firstItem="RlK-Vt-fx5" firstAttribute="width" secondItem="svH-Pt-448" secondAttribute="width" id="GQl-jA-7Pd"/>
                             <constraint firstItem="w7S-yQ-AOk" firstAttribute="leading" secondItem="svH-Pt-448" secondAttribute="leadingMargin" constant="50" id="U1d-7S-m3C"/>
                             <constraint firstItem="4fe-9y-Sbt" firstAttribute="centerY" secondItem="jk3-fo-9qC" secondAttribute="centerY" id="VGV-KZ-y9R"/>
+                            <constraint firstItem="9N8-Bk-ekT" firstAttribute="width" secondItem="RlK-Vt-fx5" secondAttribute="width" id="W28-mX-Qjf"/>
+                            <constraint firstItem="GAO-Cl-Wes" firstAttribute="top" secondItem="9N8-Bk-ekT" secondAttribute="bottom" constant="20" id="Wl2-ib-Xdo"/>
                             <constraint firstItem="RlK-Vt-fx5" firstAttribute="height" secondItem="svH-Pt-448" secondAttribute="height" id="a3C-ZE-FLT"/>
                             <constraint firstAttribute="trailingMargin" secondItem="jk3-fo-9qC" secondAttribute="trailing" constant="50" id="b0P-Qq-JX1"/>
                             <constraint firstItem="jk3-fo-9qC" firstAttribute="centerY" secondItem="w7S-yQ-AOk" secondAttribute="centerY" id="f4b-NX-2JL"/>
