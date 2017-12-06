@@ -8,7 +8,7 @@
 
 import UIKit
 
-class Annotation {
+class AnnotationData {
     var position: CGPoint!
     var field: UITextField! = nil
 }

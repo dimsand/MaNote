@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 class DetailViewController: UIViewController,UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIGestureRecognizerDelegate, UITextFieldDelegate {
 
@@ -14,19 +15,44 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
     @IBOutlet weak var PhotoPrise: UIImageView!
     
     var textFiled: UITextField?
-    var annotations = [Annotation]()
+    var annotations = [AnnotationData]()
     var tagId: Int = 0
     var chosenImage: UIImage? = nil
+    var id_loaded: String = ""
+    
+    var documentsUrl: URL {
+        return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+    }
     
     func configureView() {
         // Update the user interface for the detail item.
         if let detail = detailItem {
-            if let label = detailDescriptionLabel {
-                label.text = detail.timestamp!.description
+            self.id_loaded = detail.value(forKey: "id") as! String
+            if(detail.value(forKey: "image_src") != nil){
+                self.chosenImage = self.load(fileName: detail.value(forKey: "image_src") as! String)
+                PhotoPrise?.image = self.load(fileName: detail.value(forKey: "image_src") as! String)
             }
         }
     }
+    
+    private func load(fileName: String) -> UIImage! {
+        let fileURL = documentsUrl.appendingPathComponent("\(fileName)")
+        do {
+            let imageData = try Data(contentsOf: fileURL)
+            if let image = UIImage(data: imageData) {
+                return image
+            }
+        } catch {
+            print("Error loading image : \(error)")
+        }
+        return nil
+    }
 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+    
+    }
+    
     override func viewWillAppear(_ animated: Bool)
     {
         let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(touchPhoto(touch:)))
@@ -42,6 +68,7 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
         
         let saveAnnotButton = UIBarButtonItem(title: "Save", style: UIBarButtonItemStyle.plain, target: self, action: #selector(saveImage(_:)))
         self.navigationItem.rightBarButtonItem = saveAnnotButton
+        
     }
 
     override func didReceiveMemoryWarning() {
@@ -49,7 +76,7 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
         // Dispose of any resources that can be recreated.
     }
 
-    var detailItem: Event? {
+    var detailItem: Ticket? {
         didSet {
             // Update the view.
             configureView()
@@ -58,7 +85,7 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
     
     // Création de l'EditText pour l'annotation
     func createAnnotation(position: CGPoint) {
-        let annotation = Annotation()
+        let annotation = AnnotationData()
         
         annotation.field = self.createTextField(position: position)
         annotation.position = position
@@ -129,56 +156,90 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
     }
     
         
-        @IBAction func openGallery() {
-            if UIImagePickerController.isSourceTypeAvailable(.photoLibrary){
-                let PhotoPrise = UIImagePickerController()
-                
-                PhotoPrise.delegate = self
-                PhotoPrise.sourceType = .photoLibrary;
-                PhotoPrise.allowsEditing = false
-                
-                self.present(PhotoPrise, animated: true, completion: nil)
-            }
-        }
-        
-        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-            dismiss(animated: true, completion: nil)
-        }
-        
-        public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-            if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
-                self.chosenImage = image
-                PhotoPrise.image = image
-            }
+    @IBAction func openGallery() {
+        if UIImagePickerController.isSourceTypeAvailable(.photoLibrary){
+            let PhotoPrise = UIImagePickerController()
             
-            self.dismiss(animated: true, completion: nil)
+            PhotoPrise.delegate = self
+            PhotoPrise.sourceType = .photoLibrary;
+            PhotoPrise.allowsEditing = false
+            
+            self.present(PhotoPrise, animated: true, completion: nil)
+        }
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        dismiss(animated: true, completion: nil)
+    }
+    
+    public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
+            self.chosenImage = image
+            PhotoPrise.image = image
         }
         
-        func saveImage(_ sender: Any) {
-            if (self.chosenImage != nil) {
-                let directoryPath =  NSHomeDirectory().appending("/Documents/")
-                
-                if !FileManager.default.fileExists(atPath: directoryPath) {
-                    do {
-                        try FileManager.default.createDirectory(at: NSURL.fileURL(withPath: directoryPath), withIntermediateDirectories: true, attributes: nil)
-                    } catch {
-                        print(error)
-                    }
-                }
-                
-                let filename = NSUUID().uuidString
-                let filepath = directoryPath.appending(filename)
-                let url = NSURL.fileURL(withPath: filepath)
-                
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    func saveImage(_ sender: Any) {
+        if (self.chosenImage != nil) {
+            let directoryPath =  NSHomeDirectory().appending("/Documents/")
+            
+            if !FileManager.default.fileExists(atPath: directoryPath) {
                 do {
-                    try UIImageJPEGRepresentation(self.chosenImage!, 1.0)?.write(to: url, options: .atomic)
-                    print(filepath)
+                    try FileManager.default.createDirectory(at: NSURL.fileURL(withPath: directoryPath), withIntermediateDirectories: true, attributes: nil)
                 } catch {
                     print(error)
-                    print("file cant not be save at path \(filepath), with error : \(error)");
                 }
-                
+            }
+            
+            let filename = NSUUID().uuidString
+            let filepath = directoryPath.appending(filename)
+            let url = NSURL.fileURL(withPath: filepath)
+
+            do {
+                try UIImageJPEGRepresentation(self.chosenImage!, 1.0)?.write(to: url, options: .atomic)
+            } catch {
+                print(error)
+                print("file cant not be save at path \(filepath), with error : \(error)");
+            }
+            
+            // Save annotations in CoreData
+            for a in annotations{
+                self.saveInDb(annotation: a, imageSrc: filename)
             }
         }
+    }
+    
+    private func saveInDb(annotation: AnnotationData, imageSrc: String){
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+                return
+        }
+        let managedContext = appDelegate.persistentContainer.viewContext
+        let fetchRequest:NSFetchRequest<NSFetchRequestResult> = NSFetchRequest.init(entityName: "Ticket")
+        fetchRequest.predicate = NSPredicate(format: "id = %@", self.id_loaded)
+        do
+        {
+            let ticket = try managedContext.fetch(fetchRequest)
+            if ticket.count == 1
+            {
+                let ticketObject = ticket[0] as! NSManagedObject
+                ticketObject.setValue(Date(), forKeyPath: "timestamp")
+                ticketObject.setValue(imageSrc, forKeyPath: "image_src")
+                do{
+                    try managedContext.save()
+                }
+                catch
+                {
+                    print(error)
+                }
+            }
+        }
+        catch
+        {
+            print(error)
+        }
+        
+    }
 }
 
