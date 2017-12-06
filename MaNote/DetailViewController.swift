@@ -16,6 +16,7 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
     
     var textFiled: UITextField?
     var annotations = [AnnotationData]()
+    var annnotationsModel = [Annotation]()
     var tagId: Int = 0
     var id_loaded: String = ""
     
@@ -26,6 +27,32 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
     func configureView() {
         // Update the user interface for the detail item.
         if let detail = detailItem {
+            
+            if (annnotationsModel.count == 0) {
+                guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+                    return
+                }
+                
+                let managedContext = appDelegate.persistentContainer.viewContext
+                
+                let fetchRequest:NSFetchRequest<NSFetchRequestResult> = NSFetchRequest.init(entityName: "Annotation")
+                fetchRequest.predicate = NSPredicate(format: "ticket_id = %@", detail.id!)
+                do
+                {
+                    annnotationsModel = try managedContext.fetch(fetchRequest) as! [Annotation]
+                    for model in annnotationsModel {
+                        print(model)
+                        createAnnotation(position: CGPoint(x: model.positionX, y: model.positionY), text: model.label)
+                        managedContext.delete(model)
+                    }
+                }
+                catch
+                {
+                    print(error)
+                }
+
+            }
+            
             self.id_loaded = detail.value(forKey: "id") as! String
             if(detail.value(forKey: "image_src") != nil){
                 PhotoPrise?.image = self.load(fileName: detail.value(forKey: "image_src") as! String)
@@ -69,12 +96,18 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
         
     }
     
+    override func viewDidDisappear(_ animated: Bool) {
+        annnotationsModel = [Annotation]()
+        annotations = [AnnotationData]()
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
     var detailItem: Ticket? {
+        
         didSet {
             // Update the view.
             configureView()
@@ -82,10 +115,10 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
     }
     
     // Création de l'EditText pour l'annotation
-    func createAnnotation(position: CGPoint) {
+    func createAnnotation(position: CGPoint, text: String? = "") {
         let annotation = AnnotationData()
         
-        annotation.field = self.createTextField(position: position)
+        annotation.field = self.createTextField(position: position, text: text)
         annotation.position = position
         
         self.view.layoutIfNeeded() // if you use Auto layout
@@ -94,7 +127,7 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
         annotations.append(annotation)
     }
     
-    private func createTextField(position: CGPoint) -> UITextField {
+    private func createTextField(position: CGPoint, text: String? = "") -> UITextField {
         let sampleTextField = UITextField(frame: CGRect(x: position.x, y: position.y, width: getWidth(text: "Votre annotation ici"), height: 40))
         
         sampleTextField.placeholder = "Votre annotation ici"
@@ -109,6 +142,7 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
         sampleTextField.delegate = self
         tagId = tagId + 1
         sampleTextField.tag = tagId
+        sampleTextField.text = text
         
         return sampleTextField
     }
@@ -141,8 +175,6 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
             self.createAnnotation(position: touch.location(in: PhotoPrise) as CGPoint)
         }
     }
-    
-    
     
     @IBAction func openGallery() {
         if UIImagePickerController.isSourceTypeAvailable(.photoLibrary){
@@ -192,17 +224,18 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
             }
             
             // Save annotations in CoreData
-            for a in annotations{
-                self.saveInDb(annotation: a, imageSrc: filename)
-            }
+        
+            self.saveInDb(imageSrc: filename)
         }
     }
     
-    private func saveInDb(annotation: AnnotationData, imageSrc: String){
+    private func saveInDb(imageSrc: String){
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
                 return
         }
+        
         let managedContext = appDelegate.persistentContainer.viewContext
+        
         let fetchRequest:NSFetchRequest<NSFetchRequestResult> = NSFetchRequest.init(entityName: "Ticket")
         fetchRequest.predicate = NSPredicate(format: "id = %@", self.id_loaded)
         do
@@ -213,6 +246,18 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
                 let ticketObject = ticket[0] as! NSManagedObject
                 ticketObject.setValue(Date(), forKeyPath: "timestamp")
                 ticketObject.setValue(imageSrc, forKeyPath: "image_src")
+                
+                for annotation in annotations {
+                    let annotationModel = Annotation(context: managedContext)
+                    
+                    // If appropriate, configure the new managed object.
+                    annotationModel.setValue(NSUUID().uuidString, forKey: "id")
+                    annotationModel.setValue(Double(annotation.position.x), forKey: "positionX")
+                    annotationModel.setValue(Double(annotation.position.y), forKey: "positionY")
+                    annotationModel.setValue(ticketObject.value(forKey: "id"), forKey: "ticket_id")
+                    annotationModel.setValue(annotation.field.text, forKey: "label")
+                }
+                
                 do{
                     try managedContext.save()
                 }
@@ -220,14 +265,16 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
                 {
                     print(error)
                 }
-           }
+            }
             
         }
         catch
         {
             print(error)
         }
+       
     }
+    
     
     @IBAction func send(_ sender: UIButton) {
         if (PhotoPrise.image != nil) {
