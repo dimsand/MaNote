@@ -352,6 +352,8 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
             composeVC.setToRecipients(["address@example.com"])
             composeVC.setSubject("Note de frais")
             composeVC.setMessageBody("Bonjour, voici ma note de frais.", isHTML: true)
+            let imageData: NSData = UIImagePNGRepresentation(PhotoPrise.image!)! as NSData
+            composeVC.addAttachmentData(imageData as Data, mimeType: "image/png", fileName: "imageName")
             
             // Present the view controller modally.
             self.present(composeVC, animated: true, completion: nil)
