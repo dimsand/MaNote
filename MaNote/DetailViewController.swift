@@ -19,6 +19,8 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
     var tagId: Int = 0
     var id_loaded: String = ""
     
+    @IBOutlet weak var saveEditButton: UIButton!
+    
     var documentsUrl: URL {
         return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
     }
@@ -64,7 +66,8 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
         // Do any additional setup after loading the view, typically from a nib.
         configureView()
         
-        let saveAnnotButton = UIBarButtonItem(title: "Save", style: UIBarButtonItemStyle.plain, target: self, action: #selector(saveImage(_:)))
+        // TODO Remplacer le save -> send mail
+        let saveAnnotButton = UIBarButtonItem(title: "Send", style: UIBarButtonItemStyle.plain, target: self, action: #selector(saveImage(_:)))
         self.navigationItem.rightBarButtonItem = saveAnnotButton
         
     }
@@ -109,6 +112,7 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
         sampleTextField.delegate = self
         tagId = tagId + 1
         sampleTextField.tag = tagId
+        sampleTextField.becomeFirstResponder()
         
         return sampleTextField
     }
@@ -137,7 +141,7 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
     }
     
     func touchPhoto(touch: UITapGestureRecognizer) {
-        if (PhotoPrise.image != nil) {
+        if (PhotoPrise.image != nil && saveEditButton.title(for: .normal) == "Save") {
             self.createAnnotation(position: touch.location(in: PhotoPrise) as CGPoint)
         }
     }
@@ -236,7 +240,7 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
                     annotation.field.isHidden = false
                 }
                 
-                sender.setTitle("Send", for: .normal)
+                sender.setTitle("Save", for: .normal)
             } else {
                 let render: UIImageView = self.PhotoPrise
                 let frame: CGRect = self.PhotoPrise.frame;
