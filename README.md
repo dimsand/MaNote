@@ -2,7 +2,7 @@
 
 ## Description
 Application pour IOS réalisée en Swift.
-Elle a pour but de prendre une photo unticket de note de frais, d'y apposer des notations (si souhaité) puis de les envoyer par mail.
+Elle a pour but de prendre une photo d'un ticket de note de frais, d'y apposer des notations (si souhaité) puis de les envoyer par mail.
 
 ## Comment l'utiliser ?
 C'est simple !
