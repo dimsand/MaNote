@@ -97,9 +97,7 @@ class DetailViewController: UIViewController,
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         configureView()
-        
-        // TODO Remplacer le save -> send mail
-        //let saveAnnotButton = UIBarButtonItem(title: "Send", style: UIBarButtonItemStyle.plain, target: self, action: #selector(saveImage(_:)))
+
         let saveAnnotButton = UIBarButtonItem(title: "Send", style: UIBarButtonItemStyle.plain, target: self, action: #selector(sendMail(_:)))
         self.navigationItem.rightBarButtonItem = saveAnnotButton
         
@@ -122,6 +120,11 @@ class DetailViewController: UIViewController,
         {
             print(error)
         }
+        
+        if(annotations.count > 0){
+            saveEditButton.setTitle("Save", for: .normal)
+        }
+        self.manageAnnotations(saveEditButton)
 
     }
     
@@ -164,15 +167,14 @@ class DetailViewController: UIViewController,
         sampleTextField.autocorrectionType = UITextAutocorrectionType.no
         sampleTextField.keyboardType = UIKeyboardType.default
         sampleTextField.returnKeyType = UIReturnKeyType.done
-        sampleTextField.clearButtonMode = UITextFieldViewMode.whileEditing;
+        sampleTextField.clearButtonMode = UITextFieldViewMode.always;
         sampleTextField.contentVerticalAlignment = UIControlContentVerticalAlignment.center
         sampleTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
         sampleTextField.delegate = self
         tagId = tagId + 1
         sampleTextField.tag = tagId
         sampleTextField.text = text
-        sampleTextField.becomeFirstResponder()
-        
+        //sampleTextField.becomeFirstResponder()
         return sampleTextField
     }
     
@@ -207,6 +209,10 @@ class DetailViewController: UIViewController,
     func touchPhoto(touch: UITapGestureRecognizer) {
         if (PhotoPrise.image != nil && saveEditButton.title(for: .normal) == "Save") {
             self.createAnnotation(position: touch.location(in: PhotoPrise) as CGPoint)
+        }else{
+            let alert = UIAlertController(title: "Action refusée", message: "Veuillez passer en mode Edit pour ajouter de nouvelles annotations", preferredStyle: UIAlertControllerStyle.alert)
+            alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
         }
     }
     
@@ -260,7 +266,6 @@ class DetailViewController: UIViewController,
             }
             
             // Save annotations in CoreData
-        
             self.saveInDb(imageSrc: filename)
         }
     }
@@ -304,42 +309,43 @@ class DetailViewController: UIViewController,
                     print(error)
                 }
             }
-            
         }
         catch
         {
             print(error)
         }
-       
     }
-    
     
     @IBAction func send(_ sender: UIButton) {
         if (PhotoPrise.image != nil) {
-            if (sender.title(for: .normal) == "Edit") {
-                for annotation in annotations {
-                    annotation.field.isHidden = false
-                }             
-                sender.setTitle("Save", for: .normal)
-            } else {
-                let render: UIImageView = self.PhotoPrise
-                let frame: CGRect = self.PhotoPrise.frame;
-                let size: CGSize = self.PhotoPrise.frame.size
-                
-                for annotation in annotations {
-                    let textImgView = UIImageView(frame: frame)
-                    
-                    textImgView.image = self.imageFrom(text: annotation.field.text!, position: annotation.position, size: size)
-                    render.addSubview(textImgView)
-                    text_annotations.append(textImgView)
-                    annotation.field.isHidden = true
-                }
-                
-                self.PhotoPrise.image = render.image
-                saveImage(_: (Any).self)
-                
-                sender.setTitle("Edit", for: .normal)
+            self.manageAnnotations(sender)
+        }
+    }
+    
+    private func manageAnnotations(_ sender: UIButton){
+        if (sender.title(for: .normal) == "Edit") {
+            for annotation in annotations {
+                annotation.field.isHidden = false
             }
+            sender.setTitle("Save", for: .normal)
+        } else {
+            let render: UIImageView = self.PhotoPrise
+            let frame: CGRect = self.PhotoPrise.frame;
+            let size: CGSize = self.PhotoPrise.frame.size
+            
+            for annotation in annotations {
+                let textImgView = UIImageView(frame: frame)
+                textImgView.image = self.imageFrom(text: annotation.field.text!, position: annotation.position, size: size)
+                render.addSubview(textImgView)
+                
+                text_annotations.append(textImgView)
+                annotation.field.isHidden = true
+            }
+            
+            self.PhotoPrise.image = render.image
+            saveImage(_: (Any).self)
+            
+            sender.setTitle("Edit", for: .normal)
         }
     }
     
@@ -348,36 +354,41 @@ class DetailViewController: UIViewController,
         let img = renderer.image { ctx in
             let paragraphStyle = NSMutableParagraphStyle()
             paragraphStyle.alignment = .left
-            let attrs = [NSFontAttributeName: UIFont(name: "HelveticaNeue", size: 16)!, NSForegroundColorAttributeName: UIColor.red, NSParagraphStyleAttributeName: paragraphStyle]
+            let attrs = [NSFontAttributeName: UIFont(name: "Trebuchet MS", size: 20)!, NSForegroundColorAttributeName: UIColor.red, NSParagraphStyleAttributeName: paragraphStyle, NSBackgroundColorAttributeName: UIColor.clear]
             text.draw(with: CGRect(x: (position.x), y: (position.y + 16), width: size.width, height: (size.height+100)), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
         }
-        
-
         return img
     }
     
     func sendMail(_ sender: Any) {
         if MFMailComposeViewController.canSendMail() {
+            let image_with_text = self.screenShotImageWithText()
+            let imageData: NSData = UIImagePNGRepresentation(image_with_text)! as NSData
             let composeVC = MFMailComposeViewController()
             composeVC.mailComposeDelegate = self
-            
-            // Configure the fields of the interface.
-            composeVC.setToRecipients(["address@example.com"])
             composeVC.setSubject("Note de frais")
             composeVC.setMessageBody("Bonjour, voici ma note de frais.", isHTML: true)
-            let imageData: NSData = UIImagePNGRepresentation(PhotoPrise.image!)! as NSData
-            composeVC.addAttachmentData(imageData as Data, mimeType: "image/png", fileName: "imageName")
-            
-            // Present the view controller modally.
+            composeVC.addAttachmentData(imageData as Data, mimeType: "image/png", fileName: "imageName.png  ")
             self.present(composeVC, animated: true, completion: nil)
         } else {
             print("Not working on simulator")
+            let alert = UIAlertController(title: "Action impossible", message: "L'envoi de mail n'est pas disponible sur l'émulateur", preferredStyle: UIAlertControllerStyle.alert)
+            alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
         }
+    }
+    
+    //Create the UIImage with all annotations
+    private func screenShotImageWithText() -> UIImage{
+        UIGraphicsBeginImageContext(self.PhotoPrise.frame.size)
+        self.PhotoPrise.layer.render(in: UIGraphicsGetCurrentContext()!)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return image!
     }
     
     func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
         // Check the result or perform other tasks.
-        
         // Dismiss the mail compose view controller.
         controller.dismiss(animated: true, completion: nil)
     }
