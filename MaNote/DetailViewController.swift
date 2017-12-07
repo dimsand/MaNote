@@ -158,6 +158,9 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
         sampleTextField.autocorrectionType = UITextAutocorrectionType.no
         sampleTextField.keyboardType = UIKeyboardType.default
         sampleTextField.returnKeyType = UIReturnKeyType.done
+        //sampleTextField.touchesBegan(<#T##touches: Set<UITouch>##Set<UITouch>#>, with: <#T##UIEvent?#>){
+        //    self.view.endEditing(true)
+        //}
         sampleTextField.clearButtonMode = UITextFieldViewMode.whileEditing;
         sampleTextField.contentVerticalAlignment = UIControlContentVerticalAlignment.center
         sampleTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
@@ -168,6 +171,11 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
         sampleTextField.becomeFirstResponder()
         
         return sampleTextField
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        self.view.endEditing(true)
+        return false
     }
     
     func getWidth(text: String) -> CGFloat {
@@ -344,7 +352,7 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
     }
     
     func sendMail(_ sender: Any) {
-        if !MFMailComposeViewController.canSendMail() {
+        if MFMailComposeViewController.canSendMail() {
             let composeVC = MFMailComposeViewController()
             composeVC.mailComposeDelegate = self
             
