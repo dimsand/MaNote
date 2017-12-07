@@ -10,7 +10,13 @@ import UIKit
 import CoreData
 import MessageUI
 
-class DetailViewController: UIViewController,UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIGestureRecognizerDelegate, UITextFieldDelegate ,MFMailComposeViewControllerDelegate {
+
+class DetailViewController: UIViewController,
+                            UINavigationControllerDelegate,
+                            UIImagePickerControllerDelegate,
+                            UIGestureRecognizerDelegate,
+                            UITextFieldDelegate,
+                            MFMailComposeViewControllerDelegate {
     
     @IBOutlet weak var detailDescriptionLabel: UILabel!
     @IBOutlet weak var PhotoPrise: UIImageView!
@@ -211,15 +217,17 @@ class DetailViewController: UIViewController,UINavigationControllerDelegate, UII
     }
     
     @IBAction func openGallery() {
-        if UIImagePickerController.isSourceTypeAvailable(.photoLibrary){
-            let PhotoPrise = UIImagePickerController()
-            
-            PhotoPrise.delegate = self
+        let PhotoPrise = UIImagePickerController()
+        PhotoPrise.delegate = self
+        PhotoPrise.allowsEditing = false
+        
+        if UIImagePickerController.isSourceTypeAvailable(.camera) {
+            PhotoPrise.sourceType = .camera;
+        } else if UIImagePickerController.isSourceTypeAvailable(.photoLibrary) {
             PhotoPrise.sourceType = .photoLibrary;
-            PhotoPrise.allowsEditing = false
-            
-            self.present(PhotoPrise, animated: true, completion: nil)
         }
+        
+        self.present(PhotoPrise, animated: true, completion: nil)
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
